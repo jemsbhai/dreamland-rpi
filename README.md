@@ -6,6 +6,9 @@ artwork is by Tec (Tec Fase). This repository holds the code that plays it and
 the media it plays, so the Pi is updated with a single `git pull` and started
 with a single script.
 
+The code is MIT licensed. The artwork under `media/` is not: it belongs to the
+artist and is included for this installation only. See NOTICE.
+
 ## Hardware
 
 - Raspberry Pi 4, Raspberry Pi OS desktop image (Bookworm or newer)
@@ -14,12 +17,16 @@ with a single script.
 
 ## Quick start on the Pi
 
-First time:
+On the Pi (over SSH or at a terminal):
 
-    sudo apt-get install -y git
-    git clone <repo-url> ~/dreamland
+    sudo apt-get update && sudo apt-get install -y git
+    git clone https://github.com/jemsbhai/dreamland-rpi.git ~/dreamland
     cd ~/dreamland
+    python3 display.py --dry-run
     ./run.sh
+
+No credentials are needed: the repository is public and the Pi only ever
+pulls. Pushes come from the laptop.
 
 Every time after that:
 
@@ -35,6 +42,8 @@ from the Pi's own desktop session or over SSH.
     SKIP_PULL=1 ./run.sh  # start without touching git (no network needed)
 
 To stop it: Ctrl+C in the terminal that started it, or `pkill -f display.py`.
+A plain `./run.sh` over SSH ends when the SSH session ends; for the
+installation, use the boot service below.
 
 ### Start at boot (optional, recommended for the installation)
 
