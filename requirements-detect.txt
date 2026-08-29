@@ -1,0 +1,5 @@
+# Detect mode only. Install on the Pi with:
+#   sudo apt-get install -y python3-opencv python3-numpy
+#   pip install --break-system-packages -r requirements-detect.txt
+# Loop mode needs nothing from this file.
+tflite-runtime

@@ -1,0 +1,19 @@
+[Unit]
+Description=Dreamland floor projection
+After=graphical.target
+Wants=graphical.target
+
+[Service]
+Type=simple
+User=__USER__
+WorkingDirectory=__REPO__
+Environment=DREAMLAND_FROM_SERVICE=1
+Environment=SKIP_PULL=1
+ExecStart=__REPO__/run.sh
+Restart=always
+RestartSec=5
+KillMode=mixed
+TimeoutStopSec=10
+
+[Install]
+WantedBy=graphical.target

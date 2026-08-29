@@ -1,0 +1,2 @@
+# For running the test suite on any OS.
+pytest>=7.0

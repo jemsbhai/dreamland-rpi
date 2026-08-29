@@ -1,0 +1,21 @@
+# Scripts and code must reach the Pi with LF endings regardless of the
+# Windows checkout that committed them.
+* text=auto
+*.sh text eol=lf
+*.py text eol=lf
+*.service text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+
+# Media and models are binary.
+*.mp4 binary
+*.mov binary
+*.mkv binary
+*.webm binary
+*.gif binary
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.webp binary
+*.tflite binary

@@ -1,0 +1,42 @@
+{
+  "mode": "loop",
+
+  "display": {
+    "audio": false,
+    "mpv_args": ["--hwdec=v4l2m2m-copy"]
+  },
+
+  "loop": {
+    "image_seconds": 30,
+    "restart_delay_seconds": 2
+  },
+
+  "playlist": [
+    {"file": "media/title.jpg", "seconds": 30},
+    {"file": "media/video1.mp4"},
+    {"file": "media/video2.mp4"},
+    {"file": "media/video3.mp4"},
+    {"file": "media/tecfase_01.mp4", "rotate": 90, "loops": 4, "fit": "contain"},
+    {"file": "media/tecfase_02.mp4", "rotate": 90, "loops": 3, "fit": "contain"},
+    {"file": "media/tecfase_03.mp4", "rotate": 90, "loops": 3, "fit": "contain"}
+  ],
+
+  "detect": {
+    "idle_image": "media/title.jpg",
+    "camera": "opencv",
+    "camera_index": 0,
+    "frame_width": 640,
+    "frame_height": 480,
+    "detect_fps": 5,
+    "model": "models/efficientdet_lite0.tflite",
+    "labels": "models/labels.txt",
+    "score_threshold": 0.6,
+    "cooldown_seconds": 5,
+    "loops": 10,
+    "selection": "random",
+    "max_play_seconds": 600,
+    "ipc_socket": "/tmp/dreamland-mpv.sock"
+  },
+
+  "log_file": "dreamland.log"
+}

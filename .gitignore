@@ -1,0 +1,39 @@
+# Secrets and local environment
+.env
+.env.local
+*.key
+*secrets*
+cookies*.txt
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+env/
+dist/
+build/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Runtime output on the Pi
+*.log
+*.sock
+
+# Downloader leftovers (yt-dlp)
+*.part
+*.ytdl
+*.temp.mp4
+
+# Design sources do not belong in the deployable repo
+*.xcf
+
+# Editors and OS
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store

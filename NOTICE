@@ -1,0 +1,13 @@
+NOTICE
+
+The files under media/ are exhibit artwork and are NOT covered by the MIT
+license in LICENSE. They remain the property of their creators.
+
+In particular, the tecfase_*.mp4 files are the work of the artist Tec
+(Tec Fase, https://www.instagram.com/tecfase/, https://tecfase.com/). They are
+included here with the artist's explicit permission, solely for the exhibit
+installation this repository drives. Do not copy, redistribute, or reuse them
+outside that installation without the artist's consent.
+
+The code in this repository is a display controller commissioned by the artist
+for the exhibit; it is licensed under the MIT license.
