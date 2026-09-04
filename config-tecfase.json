@@ -1,0 +1,21 @@
+{
+  "mode": "loop",
+
+  "display": {
+    "audio": false,
+    "mpv_args": ["--hwdec=v4l2m2m-copy"]
+  },
+
+  "loop": {
+    "image_seconds": 30,
+    "restart_delay_seconds": 2
+  },
+
+  "playlist": [
+    {"file": "media/tecfase_01.mp4", "rotate": 90, "loops": 4, "fit": "contain"},
+    {"file": "media/tecfase_02.mp4", "rotate": 90, "loops": 3, "fit": "contain"},
+    {"file": "media/tecfase_03.mp4", "rotate": 90, "loops": 3, "fit": "contain"}
+  ],
+
+  "log_file": "dreamland.log"
+}

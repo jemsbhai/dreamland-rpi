@@ -32,6 +32,27 @@ Every time after that:
 
     cd ~/dreamland && ./run.sh
 
+## Shows
+
+A show is a playlist selection, one JSON file per show. Two ship with the
+repository:
+
+| show | file | plays |
+|---|---|---|
+| `default` | `config.json` | title card, video1-3, then the three Tec Fase clips |
+| `tecfase` | `config-tecfase.json` | only the three Tec Fase clips |
+
+Switching, on the Pi:
+
+    cd ~/dreamland && ./run.sh tecfase
+    cd ~/dreamland && ./run.sh default
+
+The choice is remembered (a local `.show` file), so plain `./run.sh`, reboots,
+and the boot service keep playing the selected show until it is switched
+again. A new show is a new `config-<name>.json` committed from the laptop;
+after a pull, `./run.sh <name>` selects it. Show names and the mode words
+combine freely: `./run.sh tecfase loop`.
+
 `run.sh` pulls the latest commit, installs anything missing (mpv, plus the
 Python packages if detect mode is configured), then starts the display. It works
 from the Pi's own desktop session or over SSH.

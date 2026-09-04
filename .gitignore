@@ -23,6 +23,7 @@ htmlcov/
 # Runtime output on the Pi
 *.log
 *.sock
+.show
 
 # Downloader leftovers (yt-dlp)
 *.part

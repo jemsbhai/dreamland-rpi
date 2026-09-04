@@ -494,3 +494,23 @@ def test_main_dry_run_nothing_to_play(repo):
 def test_main_bad_config_returns_2(repo):
     path = write_config(repo, {"mode": "party"})
     assert display.main(["--config", str(path), "--dry-run"]) == 2
+
+
+# ---------------------------------------------------------------------------
+# The repository's own config files
+# ---------------------------------------------------------------------------
+
+def test_repo_config_files_are_valid_and_complete():
+    """Every show shipped in the repo must parse and reference only files that exist.
+
+    This is the guard against pushing a config that the operator's single
+    command then fails on (typo in a path, media never committed).
+    """
+    root = Path(display.__file__).resolve().parent
+    config_paths = sorted(root.glob("config*.json"))
+    assert config_paths, "no config files found next to display.py"
+    for path in config_paths:
+        config = display.load_config(path)
+        present, missing = display.resolve_playlist(config, root)
+        assert present, f"{path.name}: no playlist entry points at an existing file"
+        assert not missing, f"{path.name}: missing files {[i.path.name for i in missing]}"

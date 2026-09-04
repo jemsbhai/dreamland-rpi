@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # Dreamland floor projection: single entry point on the Raspberry Pi.
 #
-#   ./run.sh                 mode from config.json
-#   ./run.sh loop            force loop mode
-#   ./run.sh detect          force detect mode
+#   ./run.sh                 play the remembered show (initially: config.json)
+#   ./run.sh tecfase         switch to the show in config-tecfase.json and remember it
+#   ./run.sh default         switch back to config.json and remember it
+#   ./run.sh loop            force loop mode; ./run.sh detect forces detect mode
 #   SKIP_PULL=1 ./run.sh     do not touch git (offline)
 #   FOREGROUND=1 ./run.sh    run in this terminal even if the boot service is installed
 #
@@ -16,20 +17,29 @@ set -euo pipefail
 REPO="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
 cd "$REPO"
 
-MODE="${1:-}"
 SKIP_PULL="${SKIP_PULL:-0}"
 FOREGROUND="${FOREGROUND:-0}"
 FROM_SERVICE="${DREAMLAND_FROM_SERVICE:-0}"
 SERVICE_NAME="dreamland"
 UNIT_FILE="/etc/systemd/system/$SERVICE_NAME.service"
+SHOW_FILE="$REPO/.show"
 
 log() { printf '[run.sh] %s\n' "$*"; }
 die() { printf '[run.sh] ERROR: %s\n' "$*" >&2; exit 1; }
 
-case "$MODE" in
-    ""|loop|detect) ;;
-    *) die "unknown mode '$MODE' (use loop or detect)" ;;
-esac
+MODE=""
+SHOW_ARG=""
+for arg in "$@"; do
+    case "$arg" in
+        loop|detect)
+            MODE="$arg"
+            ;;
+        *)
+            [ -n "$SHOW_ARG" ] && die "more than one show given: '$SHOW_ARG' and '$arg'"
+            SHOW_ARG="$arg"
+            ;;
+    esac
+done
 
 # 1. Update ------------------------------------------------------------------
 if [ "$SKIP_PULL" != "1" ] && [ -d .git ]; then
@@ -40,14 +50,40 @@ if [ "$SKIP_PULL" != "1" ] && [ -d .git ]; then
     fi
 fi
 
-# 2. Read the config ---------------------------------------------------------
+# 2. Pick the show and read its config ---------------------------------------
+list_shows() {
+    printf 'default'
+    local f
+    for f in "$REPO"/config-*.json; do
+        [ -f "$f" ] || continue
+        printf ' %s' "$(basename "$f" .json | sed 's/^config-//')"
+    done
+}
+
+if [ -n "$SHOW_ARG" ] && [ "$SHOW_ARG" != "default" ] && [ ! -f "$REPO/config-$SHOW_ARG.json" ]; then
+    die "no such show '$SHOW_ARG'; available: $(list_shows)"
+fi
+if [ -n "$SHOW_ARG" ]; then
+    printf '%s\n' "$SHOW_ARG" > "$SHOW_FILE"
+fi
+SHOW="$(cat "$SHOW_FILE" 2>/dev/null || true)"
+SHOW="${SHOW:-default}"
+if [ "$SHOW" != "default" ] && [ ! -f "$REPO/config-$SHOW.json" ]; then
+    log "remembered show '$SHOW' no longer exists; using default"
+    SHOW="default"
+fi
+CONFIG_FILE="config.json"
+if [ "$SHOW" != "default" ]; then
+    CONFIG_FILE="config-$SHOW.json"
+fi
+
 command -v python3 >/dev/null 2>&1 || die "python3 is missing: sudo apt-get install -y python3"
 
 read_config() {
-    python3 - "$1" <<'PY'
+    python3 - "$CONFIG_FILE" "$1" <<'PY'
 import json, sys
-value = json.load(open("config.json", encoding="utf-8"))
-for part in sys.argv[1].split("."):
+value = json.load(open(sys.argv[1], encoding="utf-8"))
+for part in sys.argv[2].split("."):
     value = value.get(part, {}) if isinstance(value, dict) else {}
 print("" if isinstance(value, dict) else value)
 PY
@@ -124,7 +160,7 @@ if [ "$FROM_SERVICE" != "1" ] && [ -f "$UNIT_FILE" ]; then
         sudo -n systemctl stop "$SERVICE_NAME" || die "could not stop the service: sudo systemctl stop $SERVICE_NAME"
     else
         [ -n "$MODE" ] && log "note: the service uses the mode in config.json, not '$MODE'"
-        log "restarting the $SERVICE_NAME service (logs: journalctl -u $SERVICE_NAME -f)"
+        log "restarting the $SERVICE_NAME service (show: $SHOW; logs: journalctl -u $SERVICE_NAME -f)"
         sudo -n systemctl restart "$SERVICE_NAME" || die "could not restart the service: sudo systemctl restart $SERVICE_NAME"
         sleep 2
         systemctl --no-pager --lines=5 status "$SERVICE_NAME" || true
@@ -139,5 +175,5 @@ if [ "$FROM_SERVICE" != "1" ]; then
         sleep 1
     fi
 fi
-log "starting display.py (mode: $EFFECTIVE_MODE)"
-exec python3 "$REPO/display.py" --config "$REPO/config.json" ${MODE:+--mode "$MODE"}
+log "starting display.py (show: $SHOW, mode: $EFFECTIVE_MODE)"
+exec python3 "$REPO/display.py" --config "$REPO/$CONFIG_FILE" ${MODE:+--mode "$MODE"}
